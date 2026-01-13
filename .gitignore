@@ -1,0 +1,20 @@
+﻿# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+AppData/
+NTUSER.DAT*
+ntuser.*
+OneDrive/
+*.log
+
+# IDEs
+.vscode/
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
