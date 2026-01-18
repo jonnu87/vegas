@@ -62,25 +62,44 @@
         <p>&copy; 2026 Jonnu87. Kaikki oikeudet pidätetään.</p>
     </footer>
     <script>
+        const apiUrl = 'https://sheet.best/api/sheets/YOUR_SHEET_ID'; // Replace with your sheet.best API URL for shared responses
+
         document.addEventListener('DOMContentLoaded', loadResponses);
         document.querySelector('form').addEventListener('submit', handleSubmit);
 
-        function handleSubmit(e) {
+        async function handleSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('name').value;
             const participate = document.querySelector('input[name="participate"]:checked').value;
             const response = { name, participate, date: new Date().toISOString() };
-            let responses = JSON.parse(localStorage.getItem('responses')) || [];
-            responses.push(response);
-            localStorage.setItem('responses', JSON.stringify(responses));
-            displayResponses(responses);
+            try {
+                await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(response)
+                });
+                loadResponses();
+            } catch (e) {
+                console.error('Failed to submit to API, using local storage', e);
+                let responses = JSON.parse(localStorage.getItem('responses')) || [];
+                responses.push(response);
+                localStorage.setItem('responses', JSON.stringify(responses));
+                displayResponses(responses);
+            }
             document.getElementById('name').value = '';
             document.querySelectorAll('input[name="participate"]').forEach(r => r.checked = false);
         }
 
-        function loadResponses() {
-            const responses = JSON.parse(localStorage.getItem('responses')) || [];
-            displayResponses(responses);
+        async function loadResponses() {
+            try {
+                const res = await fetch(apiUrl);
+                const responses = await res.json();
+                displayResponses(responses);
+            } catch (e) {
+                console.error('Failed to load from API, using local storage', e);
+                const responses = JSON.parse(localStorage.getItem('responses')) || [];
+                displayResponses(responses);
+            }
         }
 
         function displayResponses(responses) {
