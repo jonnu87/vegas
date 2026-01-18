@@ -55,9 +55,49 @@
             <label for="no">Ei</label><br><br>
             <input type="submit" value="Lähetä">
         </form>
+        <h3>Vastaukset</h3>
+        <div id="responses"></div>
     </section>
     <footer>
         <p>&copy; 2026 Jonnu87. Kaikki oikeudet pidätetään.</p>
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', loadResponses);
+        document.querySelector('form').addEventListener('submit', handleSubmit);
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const participate = document.querySelector('input[name="participate"]:checked').value;
+            const response = { name, participate, date: new Date().toISOString() };
+            let responses = JSON.parse(localStorage.getItem('responses')) || [];
+            responses.push(response);
+            localStorage.setItem('responses', JSON.stringify(responses));
+            displayResponses(responses);
+            document.getElementById('name').value = '';
+            document.querySelectorAll('input[name="participate"]').forEach(r => r.checked = false);
+        }
+
+        function loadResponses() {
+            const responses = JSON.parse(localStorage.getItem('responses')) || [];
+            displayResponses(responses);
+        }
+
+        function displayResponses(responses) {
+            const container = document.getElementById('responses');
+            container.innerHTML = '';
+            if (responses.length === 0) {
+                container.innerHTML = '<p>Ei vastauksia vielä.</p>';
+                return;
+            }
+            const ul = document.createElement('ul');
+            responses.forEach(r => {
+                const li = document.createElement('li');
+                li.textContent = `${r.name}: ${r.participate}`;
+                ul.appendChild(li);
+            });
+            container.appendChild(ul);
+        }
+    </script>
 </body>
 </html>
